@@ -1,13 +1,13 @@
 package com.example.animalsapi.model;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
+@Controller
 @RequestMapping("/api/animals")
 public class AnimalController {
 
@@ -15,42 +15,68 @@ public class AnimalController {
     private AnimalService animalService;
 
     @GetMapping
-    public List<Animal> getAllAnimals() {
-        return animalService.getAllAnimals();
+    public String getAllAnimals(Model model) {
+        List<Animal> animals = animalService.getAllAnimals();
+        model.addAttribute("animalList", animals);
+        return "animal-list";
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Animal> getAnimalById(@PathVariable int id) {
+    public String getAnimalById(@PathVariable int id, Model model) {
         return animalService.getAnimalById(id)
-                .map(animal -> ResponseEntity.ok().body(animal))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+                .map(animal -> {
+                    model.addAttribute("animal", animal);
+                    return "animal-details";
+                })
+                .orElse("error/404");
     }
 
     @PostMapping
-    public ResponseEntity<Animal> addAnimal(@RequestBody Animal animal) {
-        Animal createdAnimal = animalService.addAnimal(animal);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdAnimal);
+    public String addAnimal(@ModelAttribute Animal animal) {
+        animalService.addAnimal(animal);
+        return "redirect:/api/animals";
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Animal> updateAnimal(@PathVariable int id, @RequestBody Animal animalDetails) {
-        Animal updatedAnimal = animalService.updateAnimal(id, animalDetails);
-        return ResponseEntity.ok(updatedAnimal);
+    @GetMapping("/update/{id}")
+    public String showUpdateForm(@PathVariable int id, Model model) {
+        return animalService.getAnimalById(id)
+                .map(animal -> {
+                    model.addAttribute("animal", animal);
+                    return "animal-update";
+                })
+                .orElse("error/404");
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAnimal(@PathVariable int id) {
+    @PostMapping("/update")
+    public String updateAnimal(@ModelAttribute Animal animal) {
+        animalService.updateAnimal(animal.getAnimalId(), animal);
+        return "redirect:/api/animals";
+    }
+
+    @GetMapping("/delete/{id}")
+    public String deleteAnimal(@PathVariable int id) {
         animalService.deleteAnimal(id);
-        return ResponseEntity.noContent().build();
+        return "redirect:/api/animals";
     }
 
     @GetMapping("/species/{species}")
-    public List<Animal> getAnimalsBySpecies(@PathVariable String species) {
-        return animalService.getAnimalsBySpecies(species);
+    public String getAnimalsBySpecies(@PathVariable String species, Model model) {
+        List<Animal> animals = animalService.getAnimalsBySpecies(species);
+        model.addAttribute("animalList", animals);
+        return "animal-list";
     }
 
     @GetMapping("/search")
-    public List<Animal> searchAnimals(@RequestParam String name) {
-        return animalService.searchAnimalsByName(name);
+    public String searchAnimals(@RequestParam String name, Model model) {
+        List<Animal> animals = animalService.searchAnimalsByName(name);
+        model.addAttribute("animalList", animals);
+        return "animal-list";
     }
+
+    @GetMapping("/create")
+    public String showCreateForm(Model model) {
+        model.addAttribute("animal", new Animal());
+        return "animal-create";
+    }
+
 }
