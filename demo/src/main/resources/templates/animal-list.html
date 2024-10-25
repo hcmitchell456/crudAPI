@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Animal List</title>
+</head>
+<body>
+<h1>Animal List</h1>
+<form th:action="@{/api/animals/search}" method="get">
+    <label for="name">Search by Name:</label>
+    <input type="text" id="name" name="name" />
+    <button type="submit">Search</button>
+</form>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Species</th>
+        <th>Actions</th>
+    </tr>
+    <tr th:each="animal : ${animalList}">
+        <td th:text="${animal.animalId}">1</td>
+        <td th:text="${animal.name}">Sample Name</td>
+        <td th:text="${animal.species}">Sample Species</td>
+        <td>
+            <a th:href="@{/api/animals/{id}(id=${animal.animalId})}">Details</a>
+            <a th:href="@{/api/animals/update/{id}(id=${animal.animalId})}">Update</a>
+            <a th:href="@{/api/animals/delete/{id}(id=${animal.animalId})}">Delete</a>
+        </td>
+    </tr>
+</table>
+<a href="/api/animals/create">Create New Animal</a>
+</body>
+</html>

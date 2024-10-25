@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Animal Details</title>
+</head>
+<body>
+<h1 th:text="${animal.name}">Sample Animal Name</h1>
+<p>Scientific Name: <span th:text="${animal.scientificName}">Sample Scientific Name</span></p>
+<p>Species: <span th:text="${animal.species}">Sample Species</span></p>
+<p>Habitat: <span th:text="${animal.habitat}">Sample Habitat</span></p>
+<p>Description: <span th:text="${animal.description}">Sample Description</span></p>
+<a href="/api/animals">Back to List</a>
+</body>
+</html>
